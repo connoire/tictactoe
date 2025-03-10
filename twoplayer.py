@@ -1,3 +1,5 @@
+from random import randint
+
 def checkwin(state):
 
     wincombo = [set([1, 2, 3]), set([4, 5, 6]), set([7, 8, 9]), set([1, 4, 7]), set([2, 5, 8]), set([3, 6, 9]), set([1, 5, 9]), set([3, 5, 7])]
@@ -29,10 +31,11 @@ def printboard(state):
     print(f'{state[7]} | {state[8]} | {state[9]}')
 
 
-def play():
+def twoplayer():
 
     state = [None, '.', '.', '.', '.', '.', '.', '.', '.', '.']
     turn = 0
+    rand = randint(1, 2)
     printboard(state)
 
     while True:
@@ -40,11 +43,11 @@ def play():
         status = checkwin(state)
 
         if status == 'X':
-            print('Player X Wins')
+            print('Player X Wins!')
             return
 
         if status == 'O':
-            print('Player O wins')
+            print('Player O Wins!')
             return
 
         if turn == 9:
@@ -53,7 +56,7 @@ def play():
 
         if status == None:
 
-            if turn % 2 == 0:
+            if (turn + rand) % 2 == 0:
                 place = int(input("Player X's Turn: "))
                 state[place] = 'X'
 
@@ -65,4 +68,4 @@ def play():
             turn += 1
 
 
-play()
+twoplayer()
