@@ -1,14 +1,5 @@
 from random import randint
 
-def minimax(state, computer):
-
-    status = checkwin(state)
-    
-
-
-
-    return
-
 def checkwin(state):
 
     wincombo = [set([1, 2, 3]), set([4, 5, 6]), set([7, 8, 9]), set([1, 4, 7]), set([2, 5, 8]), set([3, 6, 9]), set([1, 5, 9]), set([3, 5, 7])]
@@ -39,6 +30,55 @@ def generatemoves(state):
 
     return moves
 
+def minimax(state, depth, ismax):
+
+    status = checkwin(state)
+    if status == 'X':
+        return -10 + depth
+    elif status == 'O':
+        return 10 - depth
+    elif depth == 9:
+        return 0
+    
+    moves = generatemoves(state)
+
+    if ismax:
+        eval = -float('inf')
+
+        for move in moves:
+            temp = state.copy()
+            temp[move] = 'O'
+            eval = max(eval, minimax(temp, depth + 1, False))
+
+        return eval
+    
+    else: 
+        eval = float('inf')
+
+        for move in moves:
+            temp = state.copy()
+            temp[move] = 'X'
+            eval = min(eval, minimax(temp, depth + 1, True))
+
+        return eval
+
+def best_move(state):
+
+    eval = -float('inf')
+    best = None
+    moves = generatemoves(state)
+
+    for move in moves:
+        temp = state.copy()
+        temp[move] = 'O'
+        curr = minimax(temp, 0, False)
+
+        if curr > eval:
+            eval = curr
+            best = move
+
+    return best
+
 def printboard(state):
 
     print(f'{state[1]} | {state[2]} | {state[3]}')
@@ -52,13 +92,6 @@ def oneplayer():
     state = [None, '.', '.', '.', '.', '.', '.', '.', '.', '.']
     turn = 0
     rand = randint(1, 2)
-    
-    if randint(1, 2) == 1:
-        player = 'X'
-        computer = 'O'
-    else:
-        computer = 'X'
-        player = 'O'
 
     printboard(state)
 
@@ -66,11 +99,11 @@ def oneplayer():
         
         status = checkwin(state)
 
-        if status == player:
-            print('You Win')
+        if status == 'X':
+            print('You Win') # lolololol surely this will happen
             return
 
-        if status == computer:
+        if status == 'O':
             print('You Lose')
             return
 
@@ -78,15 +111,18 @@ def oneplayer():
             print('Draw')
             return
 
-        if status == 0:
+        if status == None:
 
             if (turn + rand) % 2 == 0:
-                place = int(input("Where would you like to play: "))
-                state[place] = player
+                place = int(input("Your Turn: "))
+                state[place] = 'X'
 
             else:
-                place = minimax(state, computer)
-                state[place] = computer
+                print("Computer's Turn")
+                place = best_move(state)
+                state[place] = 'O'
 
             printboard(state)
             turn += 1
+
+oneplayer()
