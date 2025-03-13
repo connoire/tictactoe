@@ -1,77 +1,110 @@
-from random import randint
+from random import randint, shuffle
 
-def checkwin(state):
+def checkstatus(state):
 
+    '''
+    finds the status of the game, returns 'X', 'O', 'D' if there is a result and None otherwise
+    '''
+
+    # all possible winning combinations
     wincombo = [set([1, 2, 3]), set([4, 5, 6]), set([7, 8, 9]), set([1, 4, 7]), set([2, 5, 8]), set([3, 6, 9]), set([1, 5, 9]), set([3, 5, 7])]
 
+    # find where all Xs and Os are
     x = set()
     o = set()
-    
     for i in range(1, 10):
         if state[i] == 'X':
             x.add(i)
         if state[i] == 'O':
             o.add(i)
 
+    # use subset to find if there is a winner
     for combo in wincombo:
         if combo.issubset(x):
             return 'X'
         if combo.issubset(o):
             return 'O'
-        
+    
+    # full board but no result means draw
+    if '.' not in state:
+        return 'D'
+    
+    # game not over
     return None
 
 def generatemoves(state):
 
+    '''
+    generates all possible moves of the position
+    '''
+
+    # any empty space is a possible move
     moves = []
     for i in range(1, 10):
         if state[i] == '.':
             moves.append(i)
 
+    # shuffle moves so game is different every time
+    shuffle(moves)
     return moves
 
-def minimax(state, depth, ismax):
+def minimax(state, ismax):
 
-    status = checkwin(state)
+    '''
+    minimax algorithm implementation for playing tic tac toe
+    '''
+
+    # end algorithm
+    status = checkstatus(state)
     if status == 'X':
-        return -10 + depth
+        return -10
     elif status == 'O':
-        return 10 - depth
-    elif depth == 9:
+        return 10
+    elif status == 'D':
         return 0
     
     moves = generatemoves(state)
 
+    # maximising player
     if ismax:
         eval = -float('inf')
 
         for move in moves:
             temp = state.copy()
             temp[move] = 'O'
-            eval = max(eval, minimax(temp, depth + 1, False))
+            eval = max(eval, minimax(temp, False))
 
         return eval
     
+    # minimising player
     else: 
         eval = float('inf')
 
         for move in moves:
             temp = state.copy()
             temp[move] = 'X'
-            eval = min(eval, minimax(temp, depth + 1, True))
+            eval = min(eval, minimax(temp, True))
 
         return eval
 
 def best_move(state):
 
+    '''
+    finds best move of the position
+    '''
+
     eval = -float('inf')
     best = None
+
+    # finds all possible moves
     moves = generatemoves(state)
 
     for move in moves:
         temp = state.copy()
         temp[move] = 'O'
-        curr = minimax(temp, 0, False)
+
+        # uses minimax algorithm to find which is best
+        curr = minimax(temp, False)
 
         if curr > eval:
             eval = curr
@@ -81,6 +114,10 @@ def best_move(state):
 
 def printboard(state):
 
+    '''
+    prints out the current game board
+    '''
+
     print(f'{state[1]} | {state[2]} | {state[3]}')
     print('- - - - -')
     print(f'{state[4]} | {state[5]} | {state[6]}')
@@ -88,16 +125,22 @@ def printboard(state):
     print(f'{state[7]} | {state[8]} | {state[9]}')
 
 def oneplayer():
-        
+    
+    '''
+    play tic tac toe against a bot
+    '''
+
+    # initialise game
     state = [None, '.', '.', '.', '.', '.', '.', '.', '.', '.']
     turn = 0
-    rand = randint(1, 2)
 
     printboard(state)
+    rand = randint(1, 2)
 
     while True:
         
-        status = checkwin(state)
+        # check for game end
+        status = checkstatus(state)
 
         if status == 'X':
             print('You Win') # lolololol surely this will happen
@@ -107,16 +150,26 @@ def oneplayer():
             print('You Lose')
             return
 
-        if turn == 9:
+        if status == 'D':
             print('Draw')
             return
 
         if status == None:
 
+            # player turn, random so player can play first or second
             if (turn + rand) % 2 == 0:
-                place = int(input("Your Turn: "))
+
+                while True:
+                    place = int(input("Your Turn: "))
+
+                    if state[place] == '.':
+                        break
+                    else:
+                        print('Invalid Move')
+
                 state[place] = 'X'
 
+            # computer turn
             else:
                 print("Computer's Turn")
                 place = best_move(state)
