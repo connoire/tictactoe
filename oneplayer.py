@@ -112,17 +112,38 @@ def best_move(state):
 
     return best
 
-def printboard(state):
+def printboard(state, invert):
 
     '''
     prints out the current game board
     '''
 
-    print(f'{state[1]} | {state[2]} | {state[3]}')
-    print('- - - - -')
-    print(f'{state[4]} | {state[5]} | {state[6]}')
-    print('- - - - -')
-    print(f'{state[7]} | {state[8]} | {state[9]}')
+    # regular board
+    if invert == 1:
+        print(f'{state[1]} | {state[2]} | {state[3]}')
+        print('- - - - -')
+        print(f'{state[4]} | {state[5]} | {state[6]}')
+        print('- - - - -')
+        print(f'{state[7]} | {state[8]} | {state[9]}')
+
+    # inverted board
+    else:
+        invertstate = []
+        for i in state:
+            if i == None:
+                invertstate.append(None)
+            elif i == 'X':
+                invertstate.append('O')
+            elif i == 'O':
+                invertstate.append('X')
+            else:
+                invertstate.append('.')
+
+        print(f'{invertstate[1]} | {invertstate[2]} | {invertstate[3]}')
+        print('- - - - -')
+        print(f'{invertstate[4]} | {invertstate[5]} | {invertstate[6]}')
+        print('- - - - -')
+        print(f'{invertstate[7]} | {invertstate[8]} | {invertstate[9]}')
 
 def oneplayer():
     
@@ -134,8 +155,9 @@ def oneplayer():
     state = [None, '.', '.', '.', '.', '.', '.', '.', '.', '.']
     turn = 0
 
-    printboard(state)
-    rand = randint(1, 2)
+    printboard(state, 1)
+    rand1 = randint(1, 2)
+    rand2 = randint(1, 2)
 
     while True:
         
@@ -157,7 +179,7 @@ def oneplayer():
         if status == None:
 
             # player turn, random so player can play first or second
-            if (turn + rand) % 2 == 0:
+            if (turn + rand1) % 2 == 0:
 
                 while True:
                     place = int(input("Your Turn: "))
@@ -175,7 +197,8 @@ def oneplayer():
                 place = best_move(state)
                 state[place] = 'O'
 
-            printboard(state)
+            # can also print inverted board so player can play as both X and O
+            printboard(state, rand2)
             turn += 1
 
 oneplayer()
